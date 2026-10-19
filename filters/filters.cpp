@@ -191,38 +191,27 @@ namespace blur {
         image::Image image1(image.Width(), image.Height());
         for (size_t x = 0; x < image.Width(); ++x) {
             for (size_t y = 0; y < image.Height(); ++y) {
+                float w = 0;
                 for (size_t i = (x >= k ? x - k : 0); i <= std::min(image.Width() - 1, x + k); ++i) {
                     float dist = static_cast<float>((x - i) * (x - i));
                     float coef = std::exp(-dist / (2 * sigma_ * sigma_));
                     image1.At(x, y) = image1.At(x, y) + image.At(i, y) * coef;
+                    w += coef;
                 }
+                image1.At(x, y) = image1.At(x, y) * (1 / w);
             }
         }
         for (size_t x = 0; x < image.Width(); ++x) {
             for (size_t y = 0; y < image.Height(); ++y) {
+                float w = 0;
                 image.At(x, y) = color::Color(0, 0, 0);
                 for (size_t j = (y >= k ? y - k : 0); j <= std::min(image.Height() - 1, y + k); ++j) {
                     float dist = static_cast<float>((y - j) * (y - j));
                     float coef = std::exp(-dist / (2 * sigma_ * sigma_));
                     image.At(x, y) = image.At(x, y) + image1.At(x, j) * coef;
+                    w += coef;
                 }
-            }
-        }
-        for (size_t x = 0; x < image.Width(); ++x) {
-            for (size_t y = 0; y < image.Height(); ++y) {
-                float w_i = 0;
-                float w_j = 0;
-                for (size_t i = (x >= k ? x - k : 0); i <= std::min(image.Width() - 1, x + k); ++i) {
-                    float dist = static_cast<float>((x - i) * (x - i));
-                    float coef = std::exp(-dist / (2 * sigma_ * sigma_));
-                    w_i += coef;
-                }
-                for (size_t j = (y >= k ? y - k : 0); j <= std::min(image.Height() - 1, y + k); ++j) {
-                    float dist = static_cast<float>((y - j) * (y - j));
-                    float coef = std::exp(-dist / (2 * sigma_ * sigma_));
-                    w_j += coef;
-                }
-                image.At(x, y) = image.At(x, y) * (1 / (w_i * w_j));
+                image.At(x, y) = image.At(x, y) * (1 / w);
             }
         }
         for (size_t x = 0; x < image.Width(); ++x) {
@@ -316,4 +305,3 @@ namespace twirl {
         }
     }
 }  // namespace twirl
-
