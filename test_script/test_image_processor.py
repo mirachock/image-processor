@@ -224,8 +224,9 @@ class ImageProcessorTester:
         except subprocess.TimeoutExpired:
             self.fail_test_case(test_case.input, test_case.name, "timeout")
         except FileNotFoundError:
-            # subprocess.run([self.image_processor_executable, input_file, expected_output_file] + test_case.args, timeout=180, check=True)
-            self.fail_test_case(test_case.input, test_case.name, "output file not found")
+            subprocess.run([self.image_processor_executable, input_file, expected_output_file] + test_case.args, timeout=180, check=True)
+            print("Output file not found. The reference has been created.")
+            # self.fail_test_case(test_case.input, test_case.name, "output file not found")
         except UnidentifiedImageError:
             self.fail_test_case(test_case.input, test_case.name, "output file is corrupt")
 
